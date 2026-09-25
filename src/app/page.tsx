@@ -17,11 +17,15 @@ export default async function Home() {
   const { current, next, todaysActivities } = getCurrentAndNextActivity(activities);
 
   return (
-    <main style={{ padding: '2rem', maxWidth: '480px', margin: '0 auto' }}>
-      <h1>What Is Hussain Doing?</h1>
-      <CurrentActivityCard activity={current} />
-      <NextActivityPreview activity={next} />
-      <TodaySchedule activities={todaysActivities} currentActivityId={current?.id ?? null} />
+    <main className="min-h-screen bg-neutral-950 px-5 py-12">
+      <div className="mx-auto max-w-md">
+        <h1 className="mb-8 text-lg font-medium text-neutral-300">
+          What is Hussain doing?
+        </h1>
+        <CurrentActivityCard activity={current} />
+        <NextActivityPreview activity={next} />
+        <TodaySchedule activities={todaysActivities} currentActivityId={current?.id ?? null} />
+      </div>
     </main>
   );
 }

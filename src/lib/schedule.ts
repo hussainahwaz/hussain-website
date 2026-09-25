@@ -82,3 +82,27 @@ export function getCurrentAndNextActivity(activities: Activity[]) {
 
   return { current, next, todaysActivities };
 }
+
+import {
+  GraduationCap, Utensils, Coffee, Dumbbell, Gamepad2,
+  BookOpen, Footprints, Moon, Briefcase, Home, Circle,
+} from 'lucide-react';
+
+// Maps a short "icon key" (stored in the emoji column) to a Lucide icon component.
+export const iconMap: Record<string, typeof Circle> = {
+  university: GraduationCap,
+  lunch: Utensils,
+  dinner: Utensils,
+  breakfast: Coffee,
+  gym: Dumbbell,
+  gaming: Gamepad2,
+  study: BookOpen,
+  walking: Footprints,
+  sleep: Moon,
+  work: Briefcase,
+  home: Home,
+};
+
+export function getActivityIcon(key: string) {
+  return iconMap[key] ?? Circle; // fallback icon if key isn't recognized
+}
