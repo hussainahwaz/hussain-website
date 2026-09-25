@@ -1,5 +1,8 @@
 import { supabase } from '@/lib/supabase';
 import { getCurrentAndNextActivity } from '@/lib/schedule';
+import { CurrentActivityCard } from '@/components/CurrentActivityCard';
+import { NextActivityPreview } from '@/components/NextActivityPreview';
+import { TodaySchedule } from '@/components/TodaySchedule';
 
 export default async function Home() {
   const { data: activities, error } = await supabase
@@ -14,16 +17,11 @@ export default async function Home() {
   const { current, next, todaysActivities } = getCurrentAndNextActivity(activities);
 
   return (
-    <main style={{ padding: '2rem' }}>
-      <h1>Logic test</h1>
-      <p>Current: {current ? `${current.emoji} ${current.name}` : 'Nothing right now'}</p>
-      <p>Next: {next ? `${next.emoji} ${next.name}` : 'Nothing next'}</p>
-      <h2>Today's activities ({todaysActivities.length})</h2>
-      <ul>
-        {todaysActivities.map((a) => (
-          <li key={a.id}>{a.emoji} {a.name} — {a.start_time} to {a.end_time}</li>
-        ))}
-      </ul>
+    <main style={{ padding: '2rem', maxWidth: '480px', margin: '0 auto' }}>
+      <h1>What Is Hussain Doing?</h1>
+      <CurrentActivityCard activity={current} />
+      <NextActivityPreview activity={next} />
+      <TodaySchedule activities={todaysActivities} currentActivityId={current?.id ?? null} />
     </main>
   );
 }
