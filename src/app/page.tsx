@@ -3,6 +3,7 @@ import { getCurrentAndNextActivity } from '@/lib/schedule';
 import { CurrentActivityCard } from '@/components/CurrentActivityCard';
 import { NextActivityPreview } from '@/components/NextActivityPreview';
 import { TodaySchedule } from '@/components/TodaySchedule';
+import { NotifyButton } from '@/components/NotifyButton';
 
 export default async function Home() {
   const { data: activities, error } = await supabase
@@ -25,6 +26,7 @@ export default async function Home() {
         <CurrentActivityCard activity={current} />
         <NextActivityPreview activity={next} />
         <TodaySchedule activities={todaysActivities} currentActivityId={current?.id ?? null} />
+        <NotifyButton />
       </div>
     </main>
   );
