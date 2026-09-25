@@ -62,16 +62,55 @@ export function getCurrentAndNextActivity(activities: Activity[]) {
   const { dayOfWeek, timeString, dateString } = getNowInTimezone();
   const nowMinutes = toMinutes(timeString);
 
+  // We need to consider not just today's activities, but also any activity
+  // that started YESTERDAY and crosses midnight into today.
+  const yesterdayDayOfWeek = (dayOfWeek + 6) % 7; // wraps 0 (Sun) back to 6 (Sat)
+
   const todaysActivities = activities
     .filter((a) => activityAppliesToday(a, dayOfWeek, dateString))
     .sort((a, b) => toMinutes(a.start_time) - toMinutes(b.start_time));
 
+  const overnightFromYesterday = activities.filter((a) => {
+    const crossesMidnight = toMinutes(a.end_time) <= toMinutes(a.start_time);
+    if (!crossesMidnight) return false;
+    // Was this activity scheduled for yesterday (recurring) and still running?
+    return a.day_of_week === yesterdayDayOfWeek && a.specific_date === null;
+  });
+
   let current: Activity | null = null;
   let next: Activity | null = null;
+
+  // Check overnight activities from yesterday first — e.g. Sleep 23:00-07:00,
+  // and it's currently 02:00, so this is still "current" even though it
+  // technically started "yesterday."
+  for (const activity of overnightFromYesterday) {
+    const start = toMinutes(activity.start_time);
+    const end = toMinutes(activity.end_time);
+    if (nowMinutes < end || nowMinutes >= start) {
+      // still within the overnight window (early morning portion)
+      if (nowMinutes < end) {
+        current = activity;
+      }
+    }
+  }
 
   for (const activity of todaysActivities) {
     const start = toMinutes(activity.start_time);
     const end = toMinutes(activity.end_time);
+    const crossesMidnight = end <= start;
+
+    if (crossesMidnight) {
+      // e.g. starts at 23:00, ends at 07:00 tomorrow — "current" if we're
+      // past the start time today (the early-morning portion is handled
+      // by the overnightFromYesterday check above).
+      if (nowMinutes >= start) {
+        current = activity;
+      } else if (next === null) {
+        // hasn't started yet today — it's a valid "next" candidate
+        next = activity;
+      }
+      continue;
+    }
 
     if (nowMinutes >= start && nowMinutes < end) {
       current = activity;
